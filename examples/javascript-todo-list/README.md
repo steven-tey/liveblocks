@@ -16,12 +16,10 @@ You can also follow our [step by step tutorial](https://liveblocks.io/docs/tutor
 
 ### Run examples locally
 
-- Install all dependencies with `npm install`
-
 - Create an account on [liveblocks.io](https://liveblocks.io/dashboard)
 
 - Copy your public key from the [administration](https://liveblocks.io/dashboard/apikeys)
 
-- Replace `pk_YOUR_PUBLIC_KEY` with your own public key.
+- Replace `pk_YOUR_PUBLIC_KEY` in `static/app.js` with your own public key.
 
-- Run `npm build` and open `static/index.html`
+- Run `npm start` and open `http://localhost:8080`

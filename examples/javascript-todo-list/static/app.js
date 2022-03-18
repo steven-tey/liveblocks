@@ -1,4 +1,7 @@
-import { createClient, LiveList } from "@liveblocks/client";
+import {
+  createClient,
+  LiveList,
+} from "https://cdn.skypack.dev/@liveblocks/client";
 
 const client = createClient({
   publicApiKey: "pk_YOUR_PUBLIC_KEY",
