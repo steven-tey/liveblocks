@@ -139,6 +139,19 @@ export type Client = {
   ): Room;
 
   /**
+   * Creates a room without entering it.
+   * @param roomId The id of the room
+   * @param defaultPresence Optional. Should be serializable to JSON. If omitted, an empty object will be used.
+   */
+  create<TStorageRoot extends Record<string, any> = Record<string, any>>(
+    roomId: string,
+    options?: {
+      defaultPresence?: Presence;
+      defaultStorageRoot?: TStorageRoot;
+    }
+  ): Room;
+
+  /**
    * Leaves a room.
    * @param roomId The id of the room
    */
@@ -634,4 +647,6 @@ export type Room = {
    * });
    */
   batch: (fn: () => void) => void;
+
+  connect(): void;
 };

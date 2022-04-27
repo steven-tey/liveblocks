@@ -7,7 +7,7 @@ import { createClient } from "@liveblocks/client";
 import { LiveblocksProvider, RoomProvider } from "@liveblocks/react";
 
 // Replace this key with your public key provided at https://liveblocks.io/dashboard/apikeys
-const PUBLIC_KEY = "pk_xxxxxxx";
+const PUBLIC_KEY = "pk_live_gR28tXK1erLF6Ub--iZKhiaE";
 
 if (PUBLIC_KEY.startsWith("pk_xxxxxxx")) {
   throw new Error(

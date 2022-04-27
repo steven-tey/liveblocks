@@ -37,6 +37,36 @@ export function createClient(options: ClientOptions): Client {
     return internalRoom ? internalRoom.room : null;
   }
 
+  function create<TStorageRoot>(
+    roomId: string,
+    options: {
+      defaultPresence?: Presence;
+      defaultStorageRoot?: TStorageRoot;
+    } = {}
+  ): Room {
+    let internalRoom = rooms.get(roomId);
+    if (internalRoom) {
+      return internalRoom.room;
+    }
+    internalRoom = createRoom(
+      {
+        defaultPresence: options.defaultPresence,
+        defaultStorageRoot: options.defaultStorageRoot,
+      },
+      {
+        roomId,
+        throttleDelay,
+        WebSocketPolyfill: clientOptions.WebSocketPolyfill,
+        fetchPolyfill: clientOptions.fetchPolyfill,
+        liveblocksServer:
+          (clientOptions as any).liveblocksServer || "wss://liveblocks.net/v5",
+        authentication: prepareAuthentication(clientOptions),
+      }
+    );
+    rooms.set(roomId, internalRoom);
+    return internalRoom.room;
+  }
+
   function enter<TStorageRoot>(
     roomId: string,
     options: {
@@ -103,6 +133,7 @@ export function createClient(options: ClientOptions): Client {
     getRoom,
     enter,
     leave,
+    create,
   };
 }
 
