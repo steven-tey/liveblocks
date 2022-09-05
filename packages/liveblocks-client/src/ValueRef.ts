@@ -50,8 +50,10 @@ export class ValueRef<T> extends ImmutableRef<T> {
   }
 
   set(newValue: T): void {
-    this._value = freeze(newValue);
-    this.invalidate();
+    if (this._value !== newValue) {
+      this._value = freeze(newValue);
+      this.invalidate();
+    }
   }
 }
 
@@ -59,6 +61,7 @@ export class ValueRef<T> extends ImmutableRef<T> {
 export class DerivedRef<T, V1, V2> extends ImmutableRef<T> {
   /** @internal */
   private _refs: readonly [ImmutableRef<V1>, ImmutableRef<V2>];
+  /** @internal */
   private _transform: (v1: V1, v2: V2) => T;
 
   constructor(
@@ -79,5 +82,68 @@ export class DerivedRef<T, V1, V2> extends ImmutableRef<T> {
   /** @internal */
   _toImmutable(): Readonly<T> {
     return this._transform(this._refs[0].current, this._refs[1].current);
+  }
+}
+
+export class MappedRef<K extends string | number, V> extends ImmutableRef<{
+  readonly [P in K]: V;
+}> {
+  /** @internal */
+  private _map: Map<K, ImmutableRef<V>>;
+  /** @internal */
+  private _unsubs: Map<K, () => void>;
+
+  constructor() {
+    super();
+    this._map = new Map();
+    this._unsubs = new Map();
+  }
+
+  /** @internal */
+  _toImmutable(): { readonly [P in K]: V } {
+    const rv = {} as { [P in K]: V };
+    this._map.forEach((value, key) => {
+      rv[key] = value.current;
+    });
+    return rv;
+  }
+
+  getRef(key: K): ImmutableRef<V> | undefined {
+    return this._map.get(key);
+  }
+
+  _deleteDontInvalidate(key: K): boolean {
+    const deleted = this._map.delete(key);
+    if (deleted) {
+      const unsub = this._unsubs.get(key);
+      if (unsub) {
+        unsub();
+      }
+      this._unsubs.delete(key);
+    }
+    return deleted;
+  }
+
+  delete(key: K): void {
+    if (this._deleteDontInvalidate(key)) {
+      this.invalidate();
+    }
+  }
+
+  set(key: K, ref: ImmutableRef<V>): void {
+    this._deleteDontInvalidate(key);
+    this._map.set(key, ref);
+    this._unsubs.set(
+      key,
+      ref.didInvalidate.subscribe(() => this.invalidate())
+    );
+    this.invalidate();
+  }
+
+  clear(): void {
+    this._unsubs.forEach((unsub) => unsub());
+    this._unsubs.clear();
+    this._map.clear();
+    this.invalidate();
   }
 }

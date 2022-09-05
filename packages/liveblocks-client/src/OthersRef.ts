@@ -1,6 +1,7 @@
 import { ImmutableRef, merge } from "./ImmutableRef";
 import type { BaseUserMeta, JsonObject, Others, User } from "./types";
 import { compact, compactObject, freeze } from "./utils";
+import { MappedRef, ValueRef } from "./ValueRef";
 
 type Connection<TUserMeta extends BaseUserMeta> = {
   readonly connectionId: number;
@@ -21,7 +22,8 @@ export class OthersRef<
 > extends ImmutableRef<Others<TPresence, TUserMeta>> {
   // To track "others"
   /** @internal */
-  _connections: { [connectionId: number]: Connection<TUserMeta> };
+  _connections: MappedRef<number, Connection<TUserMeta>>;
+
   /** @internal */
   _presences: { [connectionId: number]: TPresence };
 
@@ -45,7 +47,9 @@ export class OthersRef<
     super();
 
     // Others
-    this._connections = {};
+    this._connections = new MappedRef();
+    this._connections.didInvalidate.subscribe(() => this.invalidate());
+
     this._presences = {};
     this._users = {};
   }
@@ -77,18 +81,18 @@ export class OthersRef<
   }
 
   clearOthers(): void {
-    this._connections = {};
+    this._connections.clear();
     this._presences = {};
     this._users = {};
-    this.invalidate();
+    this.invalidate(); // XXX remove this manual call when all are converted
   }
 
   /** @internal */
   _getUser(connectionId: number): User<TPresence, TUserMeta> | undefined {
-    const conn = this._connections[connectionId];
+    const conn = this._connections.getRef(connectionId);
     const presence = this._presences[connectionId];
     if (conn !== undefined && presence !== undefined) {
-      return makeUser(conn, presence);
+      return makeUser(conn.current, presence);
     }
 
     return undefined;
@@ -126,11 +130,14 @@ export class OthersRef<
     metaUserId: TUserMeta["id"],
     metaUserInfo: TUserMeta["info"]
   ): void {
-    this._connections[connectionId] = freeze({
+    this._connections.set(
       connectionId,
-      id: metaUserId,
-      info: metaUserInfo,
-    });
+      new ValueRef({
+        connectionId,
+        id: metaUserId,
+        info: metaUserInfo,
+      })
+    );
     if (this._presences[connectionId] !== undefined) {
       this._invalidateUser(connectionId);
     }
@@ -141,7 +148,7 @@ export class OthersRef<
    * the presence information.
    */
   removeConnection(connectionId: number): void {
-    delete this._connections[connectionId];
+    this._connections.delete(connectionId);
     delete this._presences[connectionId];
     this._invalidateUser(connectionId);
   }
@@ -152,7 +159,7 @@ export class OthersRef<
    */
   setOther(connectionId: number, presence: TPresence): void {
     this._presences[connectionId] = freeze(compactObject(presence));
-    if (this._connections[connectionId] !== undefined) {
+    if (this._connections.getRef(connectionId) !== undefined) {
       this._invalidateUser(connectionId);
     }
   }
