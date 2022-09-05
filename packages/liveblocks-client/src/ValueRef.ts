@@ -3,6 +3,7 @@ import { compactObject, freeze } from "./utils";
 
 /**
  * Managed immutable cache for accessing "me" presence data as read-only.
+ * XXX Update docs
  */
 export class PatchableRef<
   T extends { [key: string]: unknown }
@@ -22,6 +23,7 @@ export class PatchableRef<
 
   /**
    * Patches the current "me" instance.
+   * XXX Update docs
    */
   patch(patch: Partial<T>): void {
     const oldObj = this._obj;
