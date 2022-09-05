@@ -6,7 +6,6 @@ import { isTokenExpired, parseRoomAuthToken } from "./AuthToken";
 import type { Callback, Observable } from "./EventSource";
 import { makeEventSource } from "./EventSource";
 import { LiveObject } from "./LiveObject";
-import { MeRef } from "./MeRef";
 import { OthersRef } from "./OthersRef";
 import type {
   Authentication,
@@ -68,7 +67,7 @@ import {
   mergeStorageUpdates,
   tryParseJson,
 } from "./utils";
-import { DerivedRef, ValueRef } from "./ValueRef";
+import { DerivedRef, PatchableRef, ValueRef } from "./ValueRef";
 
 type Machine<
   TPresence extends JsonObject,
@@ -209,7 +208,7 @@ type State<
   };
 
   readonly connection: ValueRef<Connection>;
-  readonly me: MeRef<TPresence>;
+  readonly me: PatchableRef<TPresence>;
   readonly others: OthersRef<TPresence, TUserMeta>;
 
   idFactory: IdFactory | null;
@@ -1628,7 +1627,7 @@ function defaultState<
     },
 
     connection,
-    me: new MeRef(
+    me: new PatchableRef(
       initialPresence == null ? ({} as TPresence) : initialPresence
     ),
     others,

@@ -1,5 +1,37 @@
-import { ImmutableRef } from "./ImmutableRef";
+import { ImmutableRef, merge } from "./ImmutableRef";
 import { compactObject, freeze } from "./utils";
+
+/**
+ * Managed immutable cache for accessing "me" presence data as read-only.
+ */
+export class PatchableRef<
+  T extends { [key: string]: unknown }
+> extends ImmutableRef<T> {
+  /** @internal */
+  private _obj: Readonly<T>;
+
+  constructor(initialValue: T) {
+    super();
+    this._obj = freeze(compactObject(initialValue));
+  }
+
+  /** @internal */
+  _toImmutable(): Readonly<T> {
+    return this._obj;
+  }
+
+  /**
+   * Patches the current "me" instance.
+   */
+  patch(patch: Partial<T>): void {
+    const oldObj = this._obj;
+    const newObj = merge(oldObj, patch);
+    if (oldObj !== newObj) {
+      this._obj = freeze(newObj);
+      this.invalidate();
+    }
+  }
+}
 
 export class ValueRef<T> extends ImmutableRef<T> {
   /** @internal */
