@@ -41,7 +41,7 @@ export function Sheet({
   setCellValue,
   getCellExpression,
   selection,
-  others,
+  othersByCell,
 }: Props) {
   const history = useHistory();
   const [edition, setEdition] = useState<CellAddress | null>(null);
@@ -266,7 +266,7 @@ export function Sheet({
                         onStartEditing={() =>
                           setEdition({ columnId: column.id, rowId: row.id })
                         }
-                        other={others[id]}
+                        other={othersByCell[id]}
                         value={cells[id]}
                         width={column.width}
                       />
