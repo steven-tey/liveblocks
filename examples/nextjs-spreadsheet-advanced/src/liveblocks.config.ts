@@ -7,10 +7,13 @@ const client = createClient({
 });
 
 export const {
-  RoomProvider,
-  useRoom,
-  useHistory,
-  useSelf,
-  useCanUndo,
-  useCanRedo,
+  suspense: {
+    RoomProvider,
+    useCanRedo,
+    useCanUndo,
+    useHistory,
+    useOthers,
+    useRoom,
+    useSelf,
+  },
 } = createRoomContext<Presence, Storage, UserMeta>(client);

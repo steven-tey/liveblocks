@@ -27,12 +27,23 @@ import {
   useHistory,
   useSelf,
 } from "../liveblocks.config";
+import { ClientSideSuspense } from "@liveblocks/react";
 import { useSpreadsheet } from "../spreadsheet/react";
 import { createInitialStorage } from "../spreadsheet/utils";
 import { appendUnit } from "../utils/appendUnit";
 import styles from "./index.module.css";
 
 const AVATARS_MAX = 3;
+
+function Loading() {
+  return (
+    <img
+      alt="Loading"
+      className={styles.loading}
+      src="https://liveblocks.io/loading.svg"
+    />
+  );
+}
 
 function Example() {
   const spreadsheet = useSpreadsheet();
@@ -167,7 +178,9 @@ export default function Page() {
       initialStorage={initialStorage}
     >
       <TooltipProvider>
-        <Example />
+        <ClientSideSuspense fallback={<Loading />}>
+          {() => <Example />}
+        </ClientSideSuspense>
       </TooltipProvider>
     </RoomProvider>
   );
