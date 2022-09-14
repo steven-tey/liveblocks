@@ -163,9 +163,7 @@ export default function Page() {
   return (
     <RoomProvider
       id={roomId}
-      initialPresence={{
-        selectedCell: null,
-      }}
+      initialPresence={{ selectedCell: null }}
       initialStorage={initialStorage}
     >
       <TooltipProvider>
