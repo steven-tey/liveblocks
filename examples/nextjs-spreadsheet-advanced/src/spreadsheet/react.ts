@@ -1,6 +1,6 @@
 import type { User } from "@liveblocks/client";
 import { useCallback, useEffect, useState } from "react";
-import { useRoom } from "../liveblocks.config";
+import { useOthers, useRoom, useStorage } from "../liveblocks.config";
 import type {
   CellAddress,
   Column,
@@ -35,9 +35,15 @@ export interface ReactSpreadsheet {
   users: User<Presence, UserMeta>[];
 }
 
-export function useSpreadsheet(): ReactSpreadsheet | null {
+export function useSpreadsheet(): ReactSpreadsheet {
   const room = useRoom();
-  const [spreadsheet, setSpreadsheet] = useState<Spreadsheet | null>(null);
+
+  // XXX Remove this when done refactoring
+  useStorage(() => null); // Trigger suspense if not yet loaded
+
+  const [spreadsheet, setSpreadsheet] = useState<Spreadsheet>(() =>
+    createSpreadsheet(room)
+  );
   const [columns, setColumns] = useState<Column[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
   const [cells, setCells] = useState<Record<string, string>>({});
@@ -56,25 +62,31 @@ export function useSpreadsheet(): ReactSpreadsheet | null {
   );
 
   useEffect(() => {
-    createSpreadsheet(room).then((spreadsheet) => {
-      spreadsheet.onColumnsChange(setColumns);
-      spreadsheet.onRowsChange(setRows);
-      spreadsheet.onCellsChange(setCells);
-      spreadsheet.onOthersChange((others) => {
-        setUsers(others);
-        setOthersByCell(
-          others.reduce<Record<string, UserInfo>>((previous, current) => {
-            if (current.presence?.selectedCell) {
-              previous[current.presence.selectedCell] = current.info;
-            }
+    const spreadsheet = createSpreadsheet(room);
+    setSpreadsheet(spreadsheet);
 
-            return previous;
-          }, {})
-        );
-      });
+    const unsub1 = spreadsheet.onColumnsChange(setColumns);
+    const unsub2 = spreadsheet.onRowsChange(setRows);
+    const unsub3 = spreadsheet.onCellsChange(setCells);
+    const unsub4 = spreadsheet.onOthersChange((others) => {
+      setUsers(others);
+      setOthersByCell(
+        others.reduce<Record<string, UserInfo>>((previous, current) => {
+          if (current.presence?.selectedCell) {
+            previous[current.presence.selectedCell] = current.info;
+          }
 
-      setSpreadsheet(spreadsheet);
+          return previous;
+        }, {})
+      );
     });
+
+    return () => {
+      unsub1();
+      unsub2();
+      unsub3();
+      unsub4();
+    };
   }, [room]);
 
   useEffect(() => {
@@ -83,29 +95,27 @@ export function useSpreadsheet(): ReactSpreadsheet | null {
     }
   }, [columns, rows, selection, selectCell]);
 
-  return spreadsheet != null
-    ? {
-        insertRow: spreadsheet.insertRow,
-        resizeRow: spreadsheet.resizeRow,
-        moveRow: spreadsheet.moveRow,
-        clearRow: spreadsheet.clearRow,
-        deleteRow: spreadsheet.deleteRow,
-        insertColumn: spreadsheet.insertColumn,
-        resizeColumn: spreadsheet.resizeColumn,
-        moveColumn: spreadsheet.moveColumn,
-        clearColumn: spreadsheet.clearColumn,
-        deleteColumn: spreadsheet.deleteColumn,
-        getCellExpression: spreadsheet.getCellExpression,
-        getCellValue: spreadsheet.getCellValue,
-        setCellValue: spreadsheet.setCellValue,
-        deleteCell: spreadsheet.deleteCell,
-        selectCell: selectCell,
-        rows,
-        columns,
-        cells,
-        users,
-        selection,
-        othersByCell,
-      }
-    : null;
+  return {
+    insertRow: spreadsheet.insertRow,
+    resizeRow: spreadsheet.resizeRow,
+    moveRow: spreadsheet.moveRow,
+    clearRow: spreadsheet.clearRow,
+    deleteRow: spreadsheet.deleteRow,
+    insertColumn: spreadsheet.insertColumn,
+    resizeColumn: spreadsheet.resizeColumn,
+    moveColumn: spreadsheet.moveColumn,
+    clearColumn: spreadsheet.clearColumn,
+    deleteColumn: spreadsheet.deleteColumn,
+    getCellExpression: spreadsheet.getCellExpression,
+    getCellValue: spreadsheet.getCellValue,
+    setCellValue: spreadsheet.setCellValue,
+    deleteCell: spreadsheet.deleteCell,
+    selectCell: selectCell,
+    rows,
+    columns,
+    cells,
+    users,
+    selection,
+    othersByCell,
+  };
 }

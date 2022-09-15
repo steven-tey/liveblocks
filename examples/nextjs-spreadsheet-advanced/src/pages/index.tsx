@@ -52,16 +52,6 @@ function Example() {
   const canRedo = useCanRedo();
   const self = useSelf();
 
-  if (spreadsheet == null) {
-    return (
-      <img
-        alt="Loading"
-        className={styles.loading}
-        src="https://liveblocks.io/loading.svg"
-      />
-    );
-  }
-
   const { users, columns, rows, insertColumn, insertRow } = spreadsheet;
 
   return (

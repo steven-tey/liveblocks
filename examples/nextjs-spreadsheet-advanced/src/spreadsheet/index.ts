@@ -40,10 +40,13 @@ export interface Spreadsheet {
   setCellValue(columnId: string, rowId: string, value: string): void;
 }
 
-export async function createSpreadsheet(
+export function createSpreadsheet(
   room: Room<Presence, Storage, UserMeta, never>
-): Promise<Spreadsheet> {
-  const { root } = await room.getStorage();
+): Spreadsheet {
+  const root = room.getStorageSnapshot();
+  if (root == null) {
+    throw new Error("Should not happen!");
+  }
 
   const spreadsheet = root.get("spreadsheet");
 
