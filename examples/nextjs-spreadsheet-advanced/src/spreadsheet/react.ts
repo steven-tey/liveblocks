@@ -71,13 +71,12 @@ export function useSpreadsheet(): ReactSpreadsheet {
     const unsub4 = spreadsheet.onOthersChange((others) => {
       setUsers(others);
       setOthersByCell(
-        others.reduce<Record<string, UserInfo>>((previous, current) => {
-          if (current.presence?.selectedCell) {
-            previous[current.presence.selectedCell] = current.info;
+        others.reduce((prev, curr) => {
+          if (curr.presence.selectedCell) {
+            prev[curr.presence.selectedCell] = curr.info;
           }
-
-          return previous;
-        }, {})
+          return prev;
+        }, {} as Record<string, UserInfo>)
       );
     });
 
