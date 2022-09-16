@@ -224,7 +224,8 @@ export function createActions(
     return interpreter(cell?.get("value") ?? "", evaluateCellRef);
   }
 
-  function getFormattedCellValue(columnId: string, rowId: string): string {
+  function getFormattedCellValue(cellId: string): string {
+    const [columnId, rowId] = splitCellId(cellId);
     const result = evaluateCell(columnId, rowId);
     return formatExpressionResult(result);
   }
@@ -253,21 +254,22 @@ export function createActions(
   function onCellsChange(callback: (cells: Record<string, string>) => void) {
     cellCallbacks.push(callback);
     const cells = Object.fromEntries(
-      [...spreadsheet.get("cells").entries()].map(([key]) => [
-        key,
-        getFormattedCellValue(...splitCellId(key)),
+      [...spreadsheet.get("cells").keys()].map((cellId) => [
+        cellId,
+        getFormattedCellValue(cellId),
       ])
     );
     callback(cells);
     return () => removeFromArray(cellCallbacks, callback);
   }
+
   room.subscribe(
     spreadsheet.get("cells"),
     () => {
       const cells = Object.fromEntries(
-        [...spreadsheet.get("cells").entries()].map(([key]) => [
-          key,
-          getFormattedCellValue(...splitCellId(key)),
+        [...spreadsheet.get("cells").keys()].map((cellId) => [
+          cellId,
+          getFormattedCellValue(cellId),
         ])
       );
       for (const callback of cellCallbacks) {

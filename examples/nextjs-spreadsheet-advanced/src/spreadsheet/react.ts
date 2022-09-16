@@ -70,7 +70,6 @@ export function useSpreadsheet(): ReactSpreadsheet {
     setSpreadsheetActions(spreadsheet);
 
     const unsub3 = spreadsheet.onCellsChange(setEvaluatedCells);
-
     return () => {
       unsub3();
     };
