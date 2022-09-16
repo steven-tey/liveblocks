@@ -22,13 +22,15 @@ import {
 } from "../icons";
 import {
   RoomProvider,
+  useUndo,
+  useRedo,
   useCanRedo,
   useCanUndo,
-  useHistory,
   useSelf,
+  useOthersMapped,
+  useStorage,
 } from "../liveblocks.config";
 import { ClientSideSuspense } from "@liveblocks/react";
-import { useSpreadsheet } from "../spreadsheet/react";
 import { createInitialStorage } from "../spreadsheet/utils";
 import { appendUnit } from "../utils/appendUnit";
 import styles from "./index.module.css";
@@ -45,15 +47,97 @@ function Loading() {
   );
 }
 
-function Example() {
-  const spreadsheet = useSpreadsheet();
-  const history = useHistory();
+function Toolbar() {
+  const undo = useUndo();
+  const redo = useRedo();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
-  const self = useSelf();
+  const me = useSelf((me) => me.info);
 
-  const { users, columns, rows, insertColumn, insertRow } = spreadsheet;
+  // XXX Put back these mutations
+  //const { insertColumn, insertRow } = useSpreadsheet();
 
+  const users = useOthersMapped((other) => other.info);
+  const columns = useStorage((root) => root.spreadsheet.columns);
+  const rows = useStorage((root) => root.spreadsheet.rows);
+
+  return (
+    <div className={styles.banner}>
+      <div className={styles.banner_content}>
+        <div className={styles.buttons}>
+          <div className={styles.button_group} role="group">
+            <button
+              className={styles.button}
+              disabled={rows.length >= GRID_MAX_ROWS}
+              //onClick={() => insertRow(rows.length, ROW_INITIAL_HEIGHT)}
+            >
+              <AddRowAfterIcon />
+              <span>Add Row</span>
+            </button>
+            <button
+              className={styles.button}
+              disabled={columns.length >= GRID_MAX_COLUMNS}
+              //onClick={() => insertColumn(columns.length, COLUMN_INITIAL_WIDTH)}
+            >
+              <AddColumnAfterIcon />
+              <span>Add Column</span>
+            </button>
+          </div>
+          <div className={styles.button_group} role="group">
+            <Tooltip content="Undo">
+              <button
+                className={styles.button}
+                onClick={undo}
+                disabled={!canUndo}
+              >
+                <UndoIcon />
+              </button>
+            </Tooltip>
+            <Tooltip content="Redo">
+              <button
+                className={styles.button}
+                onClick={redo}
+                disabled={!canRedo}
+              >
+                <RedoIcon />
+              </button>
+            </Tooltip>
+          </div>
+        </div>
+        <div className={styles.avatars}>
+          <Avatar
+            className={styles.avatar}
+            color={me.color}
+            key="you"
+            name="You"
+            src={me.url}
+            tooltipOffset={6}
+          />
+          {users.slice(0, AVATARS_MAX - 1).map(([key, info]) => {
+            return (
+              <Avatar
+                key={key}
+                className={styles.avatar}
+                color={info.color}
+                name={info.name}
+                src={info.url}
+                tooltipOffset={6}
+              />
+            );
+          })}
+          {users.length > AVATARS_MAX - 1 ? (
+            <div className={cx(styles.avatar, styles.avatar_ellipsis)}>
+              +{users.length - AVATARS_MAX + 1}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Example() {
+  const accentColor = useSelf((me) => me.info.color);
   return (
     <main
       className={styles.container}
@@ -62,86 +146,12 @@ function Example() {
           "--column-header-width": appendUnit(COLUMN_HEADER_WIDTH),
           "--column-width": appendUnit(COLUMN_INITIAL_WIDTH),
           "--row-height": appendUnit(ROW_INITIAL_HEIGHT),
-          "--accent": self?.info.color,
+          "--accent": accentColor,
         } as CSSProperties
       }
     >
-      <div className={styles.banner}>
-        <div className={styles.banner_content}>
-          <div className={styles.buttons}>
-            <div className={styles.button_group} role="group">
-              <button
-                className={styles.button}
-                disabled={rows.length >= GRID_MAX_ROWS}
-                onClick={() => insertRow(rows.length, ROW_INITIAL_HEIGHT)}
-              >
-                <AddRowAfterIcon />
-                <span>Add Row</span>
-              </button>
-              <button
-                className={styles.button}
-                disabled={columns.length >= GRID_MAX_COLUMNS}
-                onClick={() =>
-                  insertColumn(columns.length, COLUMN_INITIAL_WIDTH)
-                }
-              >
-                <AddColumnAfterIcon />
-                <span>Add Column</span>
-              </button>
-            </div>
-            <div className={styles.button_group} role="group">
-              <Tooltip content="Undo">
-                <button
-                  className={styles.button}
-                  onClick={() => history.undo()}
-                  disabled={!canUndo}
-                >
-                  <UndoIcon />
-                </button>
-              </Tooltip>
-              <Tooltip content="Redo">
-                <button
-                  className={styles.button}
-                  onClick={() => history.redo()}
-                  disabled={!canRedo}
-                >
-                  <RedoIcon />
-                </button>
-              </Tooltip>
-            </div>
-          </div>
-          <div className={styles.avatars}>
-            {self && (
-              <Avatar
-                className={styles.avatar}
-                color={self.info.color}
-                key="you"
-                name="You"
-                src={self.info.url}
-                tooltipOffset={6}
-              />
-            )}
-            {users.slice(0, AVATARS_MAX - 1).map(({ connectionId, info }) => {
-              return (
-                <Avatar
-                  className={styles.avatar}
-                  color={info.color}
-                  key={connectionId}
-                  name={info.name}
-                  src={info.url}
-                  tooltipOffset={6}
-                />
-              );
-            })}
-            {users.length > AVATARS_MAX - 1 ? (
-              <div className={cx(styles.avatar, styles.avatar_ellipsis)}>
-                +{users.length - AVATARS_MAX + 1}
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </div>
-      <Sheet {...spreadsheet} />
+      <Toolbar />
+      <Sheet />
     </main>
   );
 }

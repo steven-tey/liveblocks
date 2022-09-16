@@ -9,9 +9,12 @@ const client = createClient({
 export const {
   suspense: {
     RoomProvider,
+    useUndo,
+    useRedo,
     useCanRedo,
     useCanUndo,
     useHistory,
+    useOthersMapped,
     useOthers,
     useRoom,
     useSelf,

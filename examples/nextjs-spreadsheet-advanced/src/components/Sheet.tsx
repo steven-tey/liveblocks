@@ -2,9 +2,10 @@ import cx from "classnames";
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { GRID_MAX_COLUMNS, GRID_MAX_ROWS } from "../constants";
-import { useHistory } from "../liveblocks.config";
+import { useHistory, useStorage } from "../liveblocks.config";
 import { getHeaderLabel } from "../spreadsheet/interpreter/utils";
 import type { ReactSpreadsheet } from "../spreadsheet/react";
+import { useSpreadsheet } from "../spreadsheet/react";
 import { getCellId } from "../spreadsheet/utils";
 import type { CellAddress, Column, Row } from "../types";
 import { TABLE_ID, canUseHotkeys } from "../utils/canUseHotkeys";
@@ -22,27 +23,30 @@ interface SortIndicator {
   type: "column" | "row";
 }
 
-export function Sheet({
-  cells,
-  columns,
-  rows,
-  moveColumn,
-  moveRow,
-  clearColumn,
-  clearRow,
-  deleteColumn,
-  deleteRow,
-  resizeColumn,
-  resizeRow,
-  insertColumn,
-  insertRow,
-  selectCell,
-  deleteCell,
-  setCellValue,
-  getCellExpression,
-  selection,
-  othersByCell,
-}: Props) {
+export function Sheet() {
+  const columns = useStorage((root) => root.spreadsheet.columns);
+  const rows = useStorage((root) => root.spreadsheet.rows);
+
+  const {
+    cells,
+    moveColumn,
+    moveRow,
+    clearColumn,
+    clearRow,
+    deleteColumn,
+    deleteRow,
+    resizeColumn,
+    resizeRow,
+    insertColumn,
+    insertRow,
+    selectCell,
+    deleteCell,
+    setCellValue,
+    getCellExpression,
+    selection,
+    othersByCell,
+  } = useSpreadsheet();
+
   const history = useHistory();
   const [edition, setEdition] = useState<CellAddress | null>(null);
   const [sortIndicator, setSortIndicator] = useState<SortIndicator>();
