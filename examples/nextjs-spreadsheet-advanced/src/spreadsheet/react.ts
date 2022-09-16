@@ -1,7 +1,7 @@
 import { shallow } from "@liveblocks/client";
 import { useCallback, useEffect, useState } from "react";
 import { useOthers, useRoom, useStorage } from "../liveblocks.config";
-import type { CellAddress, Column, Row, UserInfo } from "../types";
+import type { CellAddress, UserInfo } from "../types";
 import { type Actions, createActions } from "./actions";
 
 export interface ReactSpreadsheet {
@@ -34,14 +34,13 @@ export interface ReactSpreadsheet {
 export function useSpreadsheet(): ReactSpreadsheet {
   const room = useRoom();
 
-  // XXX Remove this when done refactoring
-  useStorage(() => null); // Trigger suspense if not yet loaded
+  // XXX Ideally don't subscribe to _all_ column/row updates at this level!
+  const columns = useStorage((root) => root.spreadsheet.columns);
+  const rows = useStorage((root) => root.spreadsheet.rows);
 
   const [actions, setSpreadsheetActions] = useState<Actions>(() =>
     createActions(room)
   );
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [rows, setRows] = useState<Row[]>([]);
   const [evaluatedCells, setEvaluatedCells] = useState<Record<string, string>>(
     {}
   );
@@ -70,13 +69,9 @@ export function useSpreadsheet(): ReactSpreadsheet {
     const spreadsheet = createActions(room);
     setSpreadsheetActions(spreadsheet);
 
-    const unsub1 = spreadsheet.onColumnsChange(setColumns);
-    const unsub2 = spreadsheet.onRowsChange(setRows);
     const unsub3 = spreadsheet.onCellsChange(setEvaluatedCells);
 
     return () => {
-      unsub1();
-      unsub2();
       unsub3();
     };
   }, [room]);

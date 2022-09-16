@@ -1,7 +1,7 @@
 import { LiveObject, type Room } from "@liveblocks/client";
 import { nanoid } from "nanoid";
 import { ID_LENGTH } from "../constants";
-import type { Column, Presence, Row, Storage, UserMeta } from "../types";
+import type { Presence, Storage, UserMeta } from "../types";
 import interpreter from "./interpreter";
 import type { ExpressionResult } from "./interpreter";
 import tokenizer, {
@@ -26,8 +26,6 @@ export interface Actions {
   // Callbacks
   // XXX Refactor these callbacks away
   onCellsChange(callback: (cells: Record<string, string>) => void): () => void;
-  onColumnsChange(callback: (columns: Column[]) => void): () => void;
-  onRowsChange(callback: (rows: Row[]) => void): () => void;
 
   // Writers
   clearColumn(index: number): void;
@@ -251,40 +249,6 @@ export function createActions(
     }
   }
 
-  const columnsCallback: Array<(columns: Column[]) => void> = [];
-  function onColumnsChange(callback: (columns: Column[]) => void) {
-    columnsCallback.push(callback);
-    callback(spreadsheet.get("columns").map((col) => col.toObject()));
-    return () => removeFromArray(columnsCallback, callback);
-  }
-  room.subscribe(
-    spreadsheet.get("columns"),
-    () => {
-      const columns = spreadsheet.get("columns").map((col) => col.toObject());
-      for (const callback of columnsCallback) {
-        callback(columns);
-      }
-    },
-    { isDeep: true }
-  );
-
-  const rowsCallback: Array<(rows: Row[]) => void> = [];
-  function onRowsChange(callback: (rows: Row[]) => void) {
-    rowsCallback.push(callback);
-    callback(spreadsheet.get("rows").map((row) => row.toObject()));
-    return () => removeFromArray(rowsCallback, callback);
-  }
-  room.subscribe(
-    spreadsheet.get("rows"),
-    () => {
-      const rows = spreadsheet.get("rows").map((row) => row.toObject());
-      for (const callback of rowsCallback) {
-        callback(rows);
-      }
-    },
-    { isDeep: true }
-  );
-
   const cellCallbacks: Array<(cells: Record<string, string>) => void> = [];
   function onCellsChange(callback: (cells: Record<string, string>) => void) {
     cellCallbacks.push(callback);
@@ -329,8 +293,6 @@ export function createActions(
     selectCell,
     getFormattedCellValue,
     getCellExpression,
-    onColumnsChange,
-    onRowsChange,
     onCellsChange,
   };
 }
