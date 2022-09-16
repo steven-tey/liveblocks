@@ -39,7 +39,6 @@ export interface Props extends Omit<ComponentProps<"td">, "onSelect"> {
   expression: string;
   height: number;
   isEditing?: boolean;
-  isSelected?: boolean;
   onCommit: (value: string, direction?: "down") => void;
   onEndEditing: () => void;
   onSelect: () => void;
@@ -382,7 +381,6 @@ export function Cell({
   expression,
   width,
   height,
-  isSelected,
   isEditing,
   onSelect,
   onStartEditing,
@@ -398,6 +396,8 @@ export function Cell({
   const other = useOthers((others) =>
     others.find((user) => user.presence.selectedCell === cellId)
   );
+
+  const isSelected = useSelf((me) => me.presence.selectedCell === cellId);
 
   const handleClick = useCallback(() => {
     if (isSelected) {

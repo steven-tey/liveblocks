@@ -235,9 +235,6 @@ export function Sheet() {
                   <th className="sr">{getHeaderLabel(y, "row")}</th>
                   {columns.map((column) => {
                     const id = toCellId(column.id, row.id);
-                    const isSelected =
-                      selection?.columnId === column.id &&
-                      selection?.rowId === row.id;
                     const isEditing =
                       edition?.columnId === column.id &&
                       edition?.rowId === row.id;
@@ -249,7 +246,6 @@ export function Sheet() {
                         expression={getCellExpression(column.id, row.id)}
                         height={row.height}
                         isEditing={isEditing}
-                        isSelected={isSelected}
                         key={id}
                         onCommit={(value, direction) => {
                           setCellValue(column.id, row.id, value);
