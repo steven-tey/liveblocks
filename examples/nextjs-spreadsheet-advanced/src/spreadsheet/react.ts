@@ -1,4 +1,5 @@
 import type { User } from "@liveblocks/client";
+import { shallow } from "@liveblocks/client";
 import { useCallback, useEffect, useState } from "react";
 import { useOthers, useRoom, useStorage } from "../liveblocks.config";
 import type {
@@ -32,7 +33,7 @@ export interface ReactSpreadsheet {
   selectCell: Spreadsheet["selectCell"];
   selection: CellAddress | null;
   setCellValue: Spreadsheet["setCellValue"];
-  users: User<Presence, UserMeta>[];
+  users: readonly User<Presence, UserMeta>[];
 }
 
 export function useSpreadsheet(): ReactSpreadsheet {
@@ -47,10 +48,18 @@ export function useSpreadsheet(): ReactSpreadsheet {
   const [columns, setColumns] = useState<Column[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
   const [cells, setCells] = useState<Record<string, string>>({});
-  const [users, setUsers] = useState<User<Presence, UserMeta>[]>([]);
   const [selection, setSelection] = useState<CellAddress | null>(null);
-  const [othersByCell, setOthersByCell] = useState<Record<string, UserInfo>>(
-    {}
+
+  const users = useOthers();
+  const othersByCell = useOthers(
+    (others) =>
+      others.reduce((prev, curr) => {
+        if (curr.presence.selectedCell) {
+          prev[curr.presence.selectedCell] = curr.info;
+        }
+        return prev;
+      }, {} as Record<string, UserInfo>),
+    shallow
   );
 
   const selectCell = useCallback(
@@ -68,23 +77,11 @@ export function useSpreadsheet(): ReactSpreadsheet {
     const unsub1 = spreadsheet.onColumnsChange(setColumns);
     const unsub2 = spreadsheet.onRowsChange(setRows);
     const unsub3 = spreadsheet.onCellsChange(setCells);
-    const unsub4 = spreadsheet.onOthersChange((others) => {
-      setUsers(others);
-      setOthersByCell(
-        others.reduce((prev, curr) => {
-          if (curr.presence.selectedCell) {
-            prev[curr.presence.selectedCell] = curr.info;
-          }
-          return prev;
-        }, {} as Record<string, UserInfo>)
-      );
-    });
 
     return () => {
       unsub1();
       unsub2();
       unsub3();
-      unsub4();
     };
   }, [room]);
 

@@ -1,4 +1,4 @@
-import { LiveObject, type Room, type User } from "@liveblocks/client";
+import { LiveObject, type Room } from "@liveblocks/client";
 import { nanoid } from "nanoid";
 import { ID_LENGTH } from "../constants";
 import type { Column, Presence, Row, Storage, UserMeta } from "../types";
@@ -30,9 +30,6 @@ export interface Spreadsheet {
   moveRow(from: number, to: number): void;
   onCellsChange(callback: (cells: Record<string, string>) => void): () => void;
   onColumnsChange(callback: (columns: Column[]) => void): () => void;
-  onOthersChange(
-    callback: (others: User<Presence, UserMeta>[]) => void
-  ): () => void;
   onRowsChange(callback: (rows: Row[]) => void): () => void;
   resizeColumn(index: number, width: number): void;
   resizeRow(index: number, height: number): void;
@@ -246,22 +243,6 @@ export function createSpreadsheet(
     }
   }
 
-  const othersCallbacks: Array<(others: User<Presence, UserMeta>[]) => void> =
-    [];
-  function onOthersChange(
-    callback: (others: User<Presence, UserMeta>[]) => void
-  ) {
-    othersCallbacks.push(callback);
-    callback(room.getOthers().toArray());
-    return () => removeFromArray(othersCallbacks, callback);
-  }
-  room.subscribe("others", (others) => {
-    const users = others.toArray();
-    for (const callback of othersCallbacks) {
-      callback(users);
-    }
-  });
-
   const columnsCallback: Array<(columns: Column[]) => void> = [];
   function onColumnsChange(callback: (columns: Column[]) => void) {
     columnsCallback.push(callback);
@@ -340,7 +321,6 @@ export function createSpreadsheet(
     selectCell,
     getCellValue,
     getCellExpression,
-    onOthersChange,
     onColumnsChange,
     onRowsChange,
     onCellsChange,
