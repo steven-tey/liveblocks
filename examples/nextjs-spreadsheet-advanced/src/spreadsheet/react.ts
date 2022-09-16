@@ -6,14 +6,14 @@ import { type Actions, createActions } from "./actions";
 
 export interface ReactSpreadsheet {
   // XXX Move these data fields away
-  cells: Record<string, string>;
+  evaluatedCells: Record<string, string>;
   othersByCell: Record<string, UserInfo>;
   selection: CellAddress | null;
 
   // Readers
   // XXX Move these readers away
   getCellExpression: Actions["getCellExpression"];
-  getCellValue: Actions["getCellValue"];
+  getFormattedCellValue: Actions["getFormattedCellValue"];
 
   // Actions
   clearColumn: Actions["clearColumn"];
@@ -42,7 +42,9 @@ export function useSpreadsheet(): ReactSpreadsheet {
   );
   const [columns, setColumns] = useState<Column[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
-  const [cells, setCells] = useState<Record<string, string>>({});
+  const [evaluatedCells, setEvaluatedCells] = useState<Record<string, string>>(
+    {}
+  );
   const [selection, setSelection] = useState<CellAddress | null>(null);
 
   const othersByCell = useOthers(
@@ -70,7 +72,7 @@ export function useSpreadsheet(): ReactSpreadsheet {
 
     const unsub1 = spreadsheet.onColumnsChange(setColumns);
     const unsub2 = spreadsheet.onRowsChange(setRows);
-    const unsub3 = spreadsheet.onCellsChange(setCells);
+    const unsub3 = spreadsheet.onCellsChange(setEvaluatedCells);
 
     return () => {
       unsub1();
@@ -87,7 +89,7 @@ export function useSpreadsheet(): ReactSpreadsheet {
 
   return {
     // XXX Move these data fields away
-    cells,
+    evaluatedCells,
     selection,
     othersByCell,
 
@@ -106,7 +108,7 @@ export function useSpreadsheet(): ReactSpreadsheet {
     clearColumn: actions.clearColumn,
     deleteColumn: actions.deleteColumn,
     getCellExpression: actions.getCellExpression,
-    getCellValue: actions.getCellValue,
+    getFormattedCellValue: actions.getFormattedCellValue,
     setCellValue: actions.setCellValue,
     deleteCell: actions.deleteCell,
   };

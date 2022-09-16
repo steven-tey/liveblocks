@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { ID_LENGTH } from "../constants";
 import type { Column, Presence, Row, Storage, UserMeta } from "../types";
 import interpreter from "./interpreter";
+import type { ExpressionResult } from "./interpreter";
 import tokenizer, {
   type CellToken,
   type RefToken,
@@ -20,7 +21,7 @@ export interface Actions {
   // Readers
   // XXX Move these readers away
   getCellExpression(columnId: string, rowId: string): string;
-  getCellValue(columnId: string, rowId: string): string;
+  getFormattedCellValue(columnId: string, rowId: string): string;
 
   // Writers
   clearColumn(index: number): void;
@@ -217,17 +218,17 @@ export function createActions(
     return result.value;
   }
 
-  function evaluateCell(columnId: string, rowId: string) {
+  function evaluateCell(columnId: string, rowId: string): ExpressionResult {
     const cell = spreadsheet.get("cells").get(getCellId(columnId, rowId));
     return interpreter(cell?.get("value") ?? "", evaluateCellRef);
   }
 
-  function getCellValue(columnId: string, rowId: string) {
+  function getFormattedCellValue(columnId: string, rowId: string): string {
     const result = evaluateCell(columnId, rowId);
     return formatExpressionResult(result);
   }
 
-  function getCellExpression(columnId: string, rowId: string) {
+  function getCellExpression(columnId: string, rowId: string): string {
     const cell = spreadsheet.get("cells").get(getCellId(columnId, rowId));
     if (cell == null) {
       return "";
@@ -287,7 +288,7 @@ export function createActions(
     const cells = Object.fromEntries(
       [...spreadsheet.get("cells").entries()].map(([key]) => [
         key,
-        getCellValue(...extractCellId(key)),
+        getFormattedCellValue(...extractCellId(key)),
       ])
     );
     callback(cells);
@@ -299,7 +300,7 @@ export function createActions(
       const cells = Object.fromEntries(
         [...spreadsheet.get("cells").entries()].map(([key]) => [
           key,
-          getCellValue(...extractCellId(key)),
+          getFormattedCellValue(...extractCellId(key)),
         ])
       );
       for (const callback of cellCallbacks) {
@@ -323,7 +324,7 @@ export function createActions(
     setCellValue,
     deleteCell,
     selectCell,
-    getCellValue,
+    getFormattedCellValue,
     getCellExpression,
     onColumnsChange,
     onRowsChange,

@@ -28,7 +28,7 @@ export function Sheet() {
   const rows = useStorage((root) => root.spreadsheet.rows);
 
   const {
-    cells,
+    evaluatedCells,
     moveColumn,
     moveRow,
     clearColumn,
@@ -166,7 +166,7 @@ export function Sheet() {
   return (
     <div className={styles.sheet}>
       <Headers
-        cells={cells}
+        cells={evaluatedCells}
         className={styles.columns}
         clearHeader={clearColumn}
         columns={columns}
@@ -181,7 +181,7 @@ export function Sheet() {
         type="column"
       />
       <Headers
-        cells={cells}
+        cells={evaluatedCells}
         className={styles.rows}
         clearHeader={clearRow}
         columns={columns}
@@ -271,7 +271,7 @@ export function Sheet() {
                           setEdition({ columnId: column.id, rowId: row.id })
                         }
                         other={othersByCell[id]}
-                        value={cells[id]}
+                        value={evaluatedCells[id]}
                         width={column.width}
                       />
                     );
