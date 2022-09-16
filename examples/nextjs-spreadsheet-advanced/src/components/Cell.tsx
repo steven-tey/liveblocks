@@ -393,7 +393,7 @@ export function Cell({
   style,
   ...props
 }: Props) {
-  const self = useSelf();
+  const myColor = useSelf((me) => me.info.color);
 
   const handleClick = useCallback(() => {
     if (isSelected) {
@@ -415,8 +415,7 @@ export function Cell({
       style={
         {
           ...style,
-          "--cell-selection":
-            isSelected && self ? self.info.color : other?.color,
+          "--cell-selection": isSelected ? myColor : other?.color,
           "--cell-width": appendUnit(width),
           "--cell-height": appendUnit(height),
         } as CSSProperties

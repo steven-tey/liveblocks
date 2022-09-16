@@ -169,14 +169,12 @@ export function Sheet() {
         cells={evaluatedCells}
         className={styles.columns}
         clearHeader={clearColumn}
-        columns={columns}
         deleteHeader={deleteColumn}
         insertHeader={insertColumn}
         max={GRID_MAX_COLUMNS}
         moveHeader={moveColumn}
         onSortOver={handleColumnSortOver}
         resizeHeader={resizeColumn}
-        rows={rows}
         selectedHeader={selection?.columnId}
         type="column"
       />
@@ -184,14 +182,12 @@ export function Sheet() {
         cells={evaluatedCells}
         className={styles.rows}
         clearHeader={clearRow}
-        columns={columns}
         deleteHeader={deleteRow}
         insertHeader={insertRow}
         max={GRID_MAX_ROWS}
         moveHeader={moveRow}
         onSortOver={handleRowSortOver}
         resizeHeader={resizeRow}
-        rows={rows}
         selectedHeader={selection?.rowId}
         type="row"
       />

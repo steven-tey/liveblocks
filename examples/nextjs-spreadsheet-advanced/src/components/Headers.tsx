@@ -62,7 +62,7 @@ import {
   ResetIcon,
   TrashIcon,
 } from "../icons";
-import { useHistory, useSelf } from "../liveblocks.config";
+import { useHistory, useSelf, useStorage } from "../liveblocks.config";
 import { getHeaderLabel } from "../spreadsheet/interpreter/utils";
 import { toCellId } from "../spreadsheet/utils";
 import type { Cell, Column, Row } from "../types";
@@ -84,14 +84,12 @@ const DRAGGING_CLASS = "dragging";
 export interface Props extends ComponentProps<"div"> {
   cells: Record<string, string>;
   clearHeader: (index: number) => void;
-  columns: readonly Column[];
   deleteHeader: (index: number) => void;
   insertHeader: (index: number, width: number) => void;
   max: number;
   moveHeader: (from: number, to: number) => void;
   onSortOver: (index?: number, position?: "after" | "before") => void;
   resizeHeader: (index: number, size: number) => void;
-  rows: readonly Row[];
   selectedHeader?: string;
   type: "column" | "row";
 }
@@ -113,10 +111,8 @@ export interface HeaderProps extends ComponentProps<"div"> {
 
 export interface HeaderDragOverlayProps extends ComponentProps<"div"> {
   cells: Record<string, string>;
-  columns: readonly Column[];
   header: Column | Row;
   index: number;
-  rows: readonly Row[];
 }
 
 interface ColumnCell extends Cell {
@@ -155,12 +151,13 @@ function HeaderDragOverlay({
   index,
   header,
   cells: allCells,
-  columns,
-  rows,
   className,
   style,
   ...props
 }: HeaderDragOverlayProps) {
+  const columns = useStorage((root) => root.spreadsheet.columns);
+  const rows = useStorage((root) => root.spreadsheet.rows);
+
   const isColumn = isColumnHeader(header);
 
   const cells = useMemo(() => {
@@ -443,8 +440,6 @@ export function Headers({
   type,
   max,
   cells,
-  columns,
-  rows,
   selectedHeader,
   deleteHeader,
   clearHeader,
@@ -456,10 +451,9 @@ export function Headers({
   ...props
 }: Props) {
   const self = useSelf();
-  const isColumn = useMemo(() => type === "column", [type]);
-  const headers = useMemo(
-    () => (isColumn ? columns : rows),
-    [columns, isColumn, rows]
+  const isColumn = type === "column";
+  const headers = useStorage((root) =>
+    isColumn ? root.spreadsheet.columns : root.spreadsheet.rows
   );
   const headersIds = useMemo(
     () => headers.map((header) => header.id),
@@ -688,10 +682,8 @@ Press space or enter again to drop the ${
         {activeIndex != null ? (
           <HeaderDragOverlay
             cells={cells}
-            columns={columns}
             header={headers[activeIndex]}
             index={activeIndex}
-            rows={rows}
             style={{ "--accent": self?.info.color } as CSSProperties}
           />
         ) : null}
