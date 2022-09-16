@@ -245,7 +245,7 @@ export function Header({
   ...props
 }: HeaderProps) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const self = useSelf();
+  const myColor = useSelf((me) => me.info.color);
   const history = useHistory();
   const { listeners, setNodeRef, setActivatorNodeRef, isDragging, isOver } =
     useSortable({
@@ -423,7 +423,7 @@ export function Header({
               onOpenChange={handleDropdownOpenChange}
               open={isDropdownOpen}
               side="bottom"
-              style={{ "--accent": self?.info.color } as CSSProperties}
+              style={{ "--accent": myColor } as CSSProperties}
             >
               <button className={cx(styles.header_control, styles.header_menu)}>
                 <EllipsisIcon />
@@ -450,7 +450,7 @@ export function Headers({
   className,
   ...props
 }: Props) {
-  const self = useSelf();
+  const myColor = useSelf((me) => me.info.color);
   const isColumn = type === "column";
   const headers = useStorage((root) =>
     isColumn ? root.spreadsheet.columns : root.spreadsheet.rows
@@ -684,7 +684,7 @@ Press space or enter again to drop the ${
             cells={cells}
             header={headers[activeIndex]}
             index={activeIndex}
-            style={{ "--accent": self?.info.color } as CSSProperties}
+            style={{ "--accent": myColor } as CSSProperties}
           />
         ) : null}
       </DragOverlay>

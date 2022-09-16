@@ -52,7 +52,7 @@ function Toolbar() {
   const redo = useRedo();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
-  const me = useSelf((me) => me.info);
+  const myInfo = useSelf((me) => me.info);
 
   // XXX Put back these mutations
   //const { insertColumn, insertRow } = useSpreadsheet();
@@ -107,10 +107,10 @@ function Toolbar() {
         <div className={styles.avatars}>
           <Avatar
             className={styles.avatar}
-            color={me.color}
+            color={myInfo.color}
             key="you"
             name="You"
-            src={me.url}
+            src={myInfo.url}
             tooltipOffset={6}
           />
           {users.slice(0, AVATARS_MAX - 1).map(([key, info]) => {
@@ -137,7 +137,7 @@ function Toolbar() {
 }
 
 function Example() {
-  const accentColor = useSelf((me) => me.info.color);
+  const myColor = useSelf((me) => me.info.color);
   return (
     <main
       className={styles.container}
@@ -146,7 +146,7 @@ function Example() {
           "--column-header-width": appendUnit(COLUMN_HEADER_WIDTH),
           "--column-width": appendUnit(COLUMN_INITIAL_WIDTH),
           "--row-height": appendUnit(ROW_INITIAL_HEIGHT),
-          "--accent": accentColor,
+          "--accent": myColor,
         } as CSSProperties
       }
     >
