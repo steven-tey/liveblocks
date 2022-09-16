@@ -16,14 +16,18 @@ import {
 } from "./interpreter/utils";
 import { extractCellId, getCellId, removeFromArray } from "./utils";
 
-export interface Spreadsheet {
+export interface Actions {
+  // Readers
+  // XXX Move these readers away
+  getCellExpression(columnId: string, rowId: string): string;
+  getCellValue(columnId: string, rowId: string): string;
+
+  // Writers
   clearColumn(index: number): void;
   clearRow(index: number): void;
   deleteCell(columnId: string, rowId: string): void;
   deleteColumn(index: number): void;
   deleteRow(index: number): void;
-  getCellExpression(columnId: string, rowId: string): string;
-  getCellValue(columnId: string, rowId: string): string;
   insertColumn(index: number, width: number): void;
   insertRow(index: number, width: number): void;
   moveColumn(from: number, to: number): void;
@@ -37,9 +41,9 @@ export interface Spreadsheet {
   setCellValue(columnId: string, rowId: string, value: string): void;
 }
 
-export function createSpreadsheet(
+export function createActions(
   room: Room<Presence, Storage, UserMeta, never>
-): Spreadsheet {
+): Actions {
   const root = room.getStorageSnapshot();
   if (root == null) {
     throw new Error("Should not happen!");

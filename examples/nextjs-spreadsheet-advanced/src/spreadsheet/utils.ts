@@ -19,15 +19,14 @@ export function removeFromArray<T>(array: T[], item: T): void {
   }
 }
 
-export function getCellId(columnId: string, rowId: string) {
+export function getCellId(columnId: string, rowId: string): string {
   return `${columnId}${rowId}`;
 }
 
-export function extractCellId(cellId: string) {
+export function extractCellId(cellId: string): [string, string] {
   const columnId = cellId.slice(0, Math.max(0, cellId.length / 2));
   const rowId = cellId.slice(Math.max(0, cellId.length / 2));
-
-  return [columnId, rowId] as [string, string];
+  return [columnId, rowId];
 }
 
 function cellToRef(
