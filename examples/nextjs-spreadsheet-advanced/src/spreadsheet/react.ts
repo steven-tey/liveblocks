@@ -89,7 +89,7 @@ export function useSpreadsheet(): ReactSpreadsheet {
     othersByCell,
 
     // Customized actions
-    selectCell: selectCell,
+    selectCell,
 
     // Actions
     insertRow: actions.insertRow,
