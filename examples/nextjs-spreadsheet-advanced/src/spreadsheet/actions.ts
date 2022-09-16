@@ -15,17 +15,13 @@ import {
   formatExpressionResult,
   getHeaderLabel,
 } from "./interpreter/utils";
-import { splitCellId, toCellId, removeFromArray } from "./utils";
+import { splitCellId, toCellId } from "./utils";
 
 export interface Actions {
   // Readers
   // XXX Move these readers away
   getCellExpression(columnId: string, rowId: string): string;
   getFormattedCellValue(columnId: string, rowId: string): string;
-
-  // Callbacks
-  // XXX Refactor these callbacks away
-  onCellsChange(callback: (cells: Record<string, string>) => void): () => void;
 
   // Writers
   clearColumn(index: number): void;
@@ -224,8 +220,7 @@ export function createActions(
     return interpreter(cell?.get("value") ?? "", evaluateCellRef);
   }
 
-  function getFormattedCellValue(cellId: string): string {
-    const [columnId, rowId] = splitCellId(cellId);
+  function getFormattedCellValue(columnId: string, rowId: string): string {
     const result = evaluateCell(columnId, rowId);
     return formatExpressionResult(result);
   }
@@ -250,35 +245,6 @@ export function createActions(
     }
   }
 
-  const cellCallbacks: Array<(cells: Record<string, string>) => void> = [];
-  function onCellsChange(callback: (cells: Record<string, string>) => void) {
-    cellCallbacks.push(callback);
-    const cells = Object.fromEntries(
-      [...spreadsheet.get("cells").keys()].map((cellId) => [
-        cellId,
-        getFormattedCellValue(cellId),
-      ])
-    );
-    callback(cells);
-    return () => removeFromArray(cellCallbacks, callback);
-  }
-
-  room.subscribe(
-    spreadsheet.get("cells"),
-    () => {
-      const cells = Object.fromEntries(
-        [...spreadsheet.get("cells").keys()].map((cellId) => [
-          cellId,
-          getFormattedCellValue(cellId),
-        ])
-      );
-      for (const callback of cellCallbacks) {
-        callback(cells);
-      }
-    },
-    { isDeep: true }
-  );
-
   return {
     insertColumn,
     insertRow,
@@ -295,6 +261,5 @@ export function createActions(
     selectCell,
     getFormattedCellValue,
     getCellExpression,
-    onCellsChange,
   };
 }

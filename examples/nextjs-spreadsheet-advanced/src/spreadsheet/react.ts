@@ -1,8 +1,9 @@
 import { shallow } from "@liveblocks/client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useOthers, useRoom, useStorage } from "../liveblocks.config";
 import type { CellAddress, UserInfo } from "../types";
 import { type Actions, createActions } from "./actions";
+import { splitCellId } from "./utils";
 
 export interface ReactSpreadsheet {
   // XXX Move these data fields away
@@ -38,12 +39,21 @@ export function useSpreadsheet(): ReactSpreadsheet {
   const columns = useStorage((root) => root.spreadsheet.columns);
   const rows = useStorage((root) => root.spreadsheet.rows);
 
-  const [actions, setSpreadsheetActions] = useState<Actions>(() =>
-    createActions(room)
+  const actions: Actions = useMemo(() => createActions(room), [room]);
+
+  const rawCells = useStorage((root) => root.spreadsheet.cells);
+
+  const evaluatedCells: Record<string, string> = useMemo(
+    () =>
+      Object.fromEntries(
+        [...rawCells.keys()].map((cellId) => [
+          cellId,
+          actions.getFormattedCellValue(...splitCellId(cellId)),
+        ])
+      ),
+    [rawCells]
   );
-  const [evaluatedCells, setEvaluatedCells] = useState<Record<string, string>>(
-    {}
-  );
+
   const [selection, setSelection] = useState<CellAddress | null>(null);
 
   const othersByCell = useOthers(
@@ -64,16 +74,6 @@ export function useSpreadsheet(): ReactSpreadsheet {
     },
     [actions]
   );
-
-  useEffect(() => {
-    const spreadsheet = createActions(room);
-    setSpreadsheetActions(spreadsheet);
-
-    const unsub3 = spreadsheet.onCellsChange(setEvaluatedCells);
-    return () => {
-      unsub3();
-    };
-  }, [room]);
 
   // XXX Move this side-effect to somewhere at the top of the app!
   useEffect(() => {
