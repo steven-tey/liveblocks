@@ -20,7 +20,8 @@ import {
   useState,
 } from "react";
 import { COLORS } from "../constants";
-import { useHistory, useSelf } from "../liveblocks.config";
+import { useHistory, useOthers, useSelf } from "../liveblocks.config";
+import { shallow } from "@liveblocks/react";
 import tokenizer, {
   SyntaxKind,
   tokenToString,
@@ -384,7 +385,6 @@ export function Cell({
   height,
   isSelected,
   isEditing,
-  other,
   onSelect,
   onStartEditing,
   onEndEditing,
@@ -402,6 +402,20 @@ export function Cell({
       onSelect();
     }
   }, [onSelect, onStartEditing, isSelected]);
+
+  // XXX Optimize
+  const othersByCell = useOthers(
+    (others) =>
+      others.reduce((prev, curr) => {
+        if (curr.presence.selectedCell) {
+          prev[curr.presence.selectedCell] = curr.info;
+        }
+        return prev;
+      }, {} as Record<string, UserInfo>),
+    shallow
+  );
+
+  const other = othersByCell[cellId];
 
   return (
     <td

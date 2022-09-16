@@ -44,7 +44,6 @@ export function Sheet() {
     setCellValue,
     getCellExpression,
     selection,
-    othersByCell,
   } = useSpreadsheet();
 
   const history = useHistory();
@@ -266,7 +265,6 @@ export function Sheet() {
                         onStartEditing={() =>
                           setEdition({ columnId: column.id, rowId: row.id })
                         }
-                        other={othersByCell[id]}
                         value={evaluatedCells[id]}
                         width={column.width}
                       />
