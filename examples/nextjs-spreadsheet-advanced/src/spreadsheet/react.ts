@@ -76,6 +76,7 @@ export function useSpreadsheet(): ReactSpreadsheet {
     };
   }, [room]);
 
+  // XXX Move this side-effect to somewhere at the top of the app!
   useEffect(() => {
     if (!selection && columns.length > 0 && rows.length > 0) {
       selectCell(columns[0].id, rows[0].id);
