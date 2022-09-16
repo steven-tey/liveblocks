@@ -23,6 +23,12 @@ export interface Actions {
   getCellExpression(columnId: string, rowId: string): string;
   getFormattedCellValue(columnId: string, rowId: string): string;
 
+  // Callbacks
+  // XXX Refactor these callbacks away
+  onCellsChange(callback: (cells: Record<string, string>) => void): () => void;
+  onColumnsChange(callback: (columns: Column[]) => void): () => void;
+  onRowsChange(callback: (rows: Row[]) => void): () => void;
+
   // Writers
   clearColumn(index: number): void;
   clearRow(index: number): void;
@@ -33,9 +39,6 @@ export interface Actions {
   insertRow(index: number, width: number): void;
   moveColumn(from: number, to: number): void;
   moveRow(from: number, to: number): void;
-  onCellsChange(callback: (cells: Record<string, string>) => void): () => void;
-  onColumnsChange(callback: (columns: Column[]) => void): () => void;
-  onRowsChange(callback: (rows: Row[]) => void): () => void;
   resizeColumn(index: number, width: number): void;
   resizeRow(index: number, height: number): void;
   selectCell(columnId: string, rowId: string): void;
