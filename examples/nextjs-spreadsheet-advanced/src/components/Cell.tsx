@@ -21,7 +21,6 @@ import {
 } from "react";
 import { COLORS } from "../constants";
 import { useHistory, useOthers, useSelf } from "../liveblocks.config";
-import { shallow } from "@liveblocks/react";
 import tokenizer, {
   SyntaxKind,
   tokenToString,
@@ -395,6 +394,11 @@ export function Cell({
 }: Props) {
   const myColor = useSelf((me) => me.info.color);
 
+  // Return the first other user that's also focused on this cell
+  const other = useOthers((others) =>
+    others.find((user) => user.presence.selectedCell === cellId)
+  );
+
   const handleClick = useCallback(() => {
     if (isSelected) {
       onStartEditing();
@@ -402,20 +406,6 @@ export function Cell({
       onSelect();
     }
   }, [onSelect, onStartEditing, isSelected]);
-
-  // XXX Optimize
-  const othersByCell = useOthers(
-    (others) =>
-      others.reduce((prev, curr) => {
-        if (curr.presence.selectedCell) {
-          prev[curr.presence.selectedCell] = curr.info;
-        }
-        return prev;
-      }, {} as Record<string, UserInfo>),
-    shallow
-  );
-
-  const other = othersByCell[cellId];
 
   return (
     <td
@@ -429,7 +419,7 @@ export function Cell({
       style={
         {
           ...style,
-          "--cell-selection": isSelected ? myColor : other?.color,
+          "--cell-selection": isSelected ? myColor : other?.info.color,
           "--cell-width": appendUnit(width),
           "--cell-height": appendUnit(height),
         } as CSSProperties
@@ -438,8 +428,12 @@ export function Cell({
     >
       {other && (
         <div aria-hidden className={styles.user}>
-          <img alt={other.url} className={styles.user_avatar} src={other.url} />
-          <span className={styles.user_label}>{other.name}</span>
+          <img
+            alt={other.info.url}
+            className={styles.user_avatar}
+            src={other.info.url}
+          />
+          <span className={styles.user_label}>{other.info.name}</span>
         </div>
       )}
       <div className={styles.content}>
