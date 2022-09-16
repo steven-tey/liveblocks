@@ -19,11 +19,11 @@ export function removeFromArray<T>(array: T[], item: T): void {
   }
 }
 
-export function getCellId(columnId: string, rowId: string): string {
+export function toCellId(columnId: string, rowId: string): string {
   return `${columnId}${rowId}`;
 }
 
-export function extractCellId(cellId: string): [string, string] {
+export function splitCellId(cellId: string): [string, string] {
   const columnId = cellId.slice(0, Math.max(0, cellId.length / 2));
   const rowId = cellId.slice(Math.max(0, cellId.length / 2));
   return [columnId, rowId];
@@ -42,7 +42,7 @@ function cellToRef(
   const column = columns[columnIndex]?.get("id")!;
   const row = rows[rowIndex]?.get("id")!;
 
-  return { kind: SyntaxKind.RefToken, ref: getCellId(column, row) };
+  return { kind: SyntaxKind.RefToken, ref: toCellId(column, row) };
 }
 
 export function createInitialStorage<X extends number, Y extends number>(
@@ -82,7 +82,7 @@ export function createInitialStorage<X extends number, Y extends number>(
           }
 
           return [
-            getCellId(columnId, rowId),
+            toCellId(columnId, rowId),
             new LiveObject({ value: expression }),
           ] as readonly [string, LiveObject<Cell>];
         }

@@ -6,7 +6,7 @@ import { useHistory, useStorage } from "../liveblocks.config";
 import { getHeaderLabel } from "../spreadsheet/interpreter/utils";
 import type { ReactSpreadsheet } from "../spreadsheet/react";
 import { useSpreadsheet } from "../spreadsheet/react";
-import { getCellId } from "../spreadsheet/utils";
+import { toCellId } from "../spreadsheet/utils";
 import type { CellAddress, Column, Row } from "../types";
 import { TABLE_ID, canUseHotkeys } from "../utils/canUseHotkeys";
 import { clamp } from "../utils/clamp";
@@ -239,7 +239,7 @@ export function Sheet() {
                 <tr key={y}>
                   <th className="sr">{getHeaderLabel(y, "row")}</th>
                   {columns.map((column) => {
-                    const id = getCellId(column.id, row.id);
+                    const id = toCellId(column.id, row.id);
                     const isSelected =
                       selection?.columnId === column.id &&
                       selection?.rowId === row.id;

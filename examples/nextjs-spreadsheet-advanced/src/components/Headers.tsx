@@ -64,7 +64,7 @@ import {
 } from "../icons";
 import { useHistory, useSelf } from "../liveblocks.config";
 import { getHeaderLabel } from "../spreadsheet/interpreter/utils";
-import { getCellId } from "../spreadsheet/utils";
+import { toCellId } from "../spreadsheet/utils";
 import type { Cell, Column, Row } from "../types";
 import { appendUnit } from "../utils/appendUnit";
 import { clamp } from "../utils/clamp";
@@ -166,7 +166,7 @@ function HeaderDragOverlay({
   const cells = useMemo(() => {
     return isColumn
       ? rows.map((row) => {
-          const cell = allCells[getCellId(header.id, row.id)];
+          const cell = allCells[toCellId(header.id, row.id)];
 
           return {
             height: row.height,
@@ -174,7 +174,7 @@ function HeaderDragOverlay({
           } as ColumnCell;
         })
       : columns.map((column) => {
-          const cell = allCells[getCellId(column.id, header.id)];
+          const cell = allCells[toCellId(column.id, header.id)];
 
           return {
             width: column.width,

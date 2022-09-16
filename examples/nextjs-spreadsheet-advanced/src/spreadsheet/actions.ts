@@ -15,7 +15,7 @@ import {
   formatExpressionResult,
   getHeaderLabel,
 } from "./interpreter/utils";
-import { extractCellId, getCellId, removeFromArray } from "./utils";
+import { splitCellId, toCellId, removeFromArray } from "./utils";
 
 export interface Actions {
   // Readers
@@ -87,7 +87,7 @@ export function createActions(
     for (const row of spreadsheet.get("rows").toArray()) {
       spreadsheet
         .get("cells")
-        .delete(getCellId(column!.get("id"), row.get("id")));
+        .delete(toCellId(column!.get("id"), row.get("id")));
     }
   }
 
@@ -98,7 +98,7 @@ export function createActions(
     for (const column of spreadsheet.get("columns").toArray()) {
       spreadsheet
         .get("cells")
-        .delete(getCellId(column.get("id"), row!.get("id")));
+        .delete(toCellId(column.get("id"), row!.get("id")));
     }
   }
 
@@ -137,11 +137,11 @@ export function createActions(
     const column = spreadsheet.get("columns").get(columnIndex)?.get("id")!;
     const row = spreadsheet.get("rows").get(rowIndex)?.get("id")!;
 
-    return { kind: SyntaxKind.RefToken, ref: getCellId(column, row) };
+    return { kind: SyntaxKind.RefToken, ref: toCellId(column, row) };
   }
 
   function refToCell(token: RefToken): CellToken {
-    const [columnId, rowId] = extractCellId(token.ref);
+    const [columnId, rowId] = splitCellId(token.ref);
 
     const columnIndex = spreadsheet
       .get("columns")
@@ -168,7 +168,7 @@ export function createActions(
   }
 
   function deleteCell(columnId: string, rowId: string) {
-    spreadsheet.get("cells").delete(getCellId(columnId, rowId));
+    spreadsheet.get("cells").delete(toCellId(columnId, rowId));
   }
 
   function setCellValue(columnId: string, rowId: string, value: string) {
@@ -189,7 +189,7 @@ export function createActions(
 
     const cells = spreadsheet.get("cells");
 
-    const cellId = getCellId(columnId, rowId);
+    const cellId = toCellId(columnId, rowId);
     const cell = cells.get(cellId);
 
     if (cell == null) {
@@ -201,12 +201,12 @@ export function createActions(
 
   function selectCell(columnId: string, rowId: string) {
     room.updatePresence({
-      selectedCell: columnId && rowId ? getCellId(columnId, rowId) : null,
+      selectedCell: columnId && rowId ? toCellId(columnId, rowId) : null,
     });
   }
 
   function evaluateCellRef(ref: string): number {
-    const [columnId, rowId] = extractCellId(ref);
+    const [columnId, rowId] = splitCellId(ref);
     const result = evaluateCell(columnId, rowId);
     if (result.type !== "number") {
       throw new Error(
@@ -219,7 +219,7 @@ export function createActions(
   }
 
   function evaluateCell(columnId: string, rowId: string): ExpressionResult {
-    const cell = spreadsheet.get("cells").get(getCellId(columnId, rowId));
+    const cell = spreadsheet.get("cells").get(toCellId(columnId, rowId));
     return interpreter(cell?.get("value") ?? "", evaluateCellRef);
   }
 
@@ -229,7 +229,7 @@ export function createActions(
   }
 
   function getCellExpression(columnId: string, rowId: string): string {
-    const cell = spreadsheet.get("cells").get(getCellId(columnId, rowId));
+    const cell = spreadsheet.get("cells").get(toCellId(columnId, rowId));
     if (cell == null) {
       return "";
     }
@@ -288,7 +288,7 @@ export function createActions(
     const cells = Object.fromEntries(
       [...spreadsheet.get("cells").entries()].map(([key]) => [
         key,
-        getFormattedCellValue(...extractCellId(key)),
+        getFormattedCellValue(...splitCellId(key)),
       ])
     );
     callback(cells);
@@ -300,7 +300,7 @@ export function createActions(
       const cells = Object.fromEntries(
         [...spreadsheet.get("cells").entries()].map(([key]) => [
           key,
-          getFormattedCellValue(...extractCellId(key)),
+          getFormattedCellValue(...splitCellId(key)),
         ])
       );
       for (const callback of cellCallbacks) {
