@@ -39,6 +39,7 @@ export function useSpreadsheet(): ReactSpreadsheet {
   const columns = useStorage((root) => root.spreadsheet.columns);
   const rows = useStorage((root) => root.spreadsheet.rows);
 
+  // XXX Can we refactor this to useActions?
   const actions: Actions = useMemo(() => createActions(room), [room]);
 
   const rawCells = useStorage((root) => root.spreadsheet.cells);
