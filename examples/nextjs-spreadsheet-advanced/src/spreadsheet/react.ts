@@ -1,25 +1,14 @@
-import type { User } from "@liveblocks/client";
 import { shallow } from "@liveblocks/client";
 import { useCallback, useEffect, useState } from "react";
 import { useOthers, useRoom, useStorage } from "../liveblocks.config";
-import type {
-  CellAddress,
-  Column,
-  Presence,
-  Row,
-  UserInfo,
-  UserMeta,
-} from "../types";
+import type { CellAddress, Column, Row, UserInfo } from "../types";
 import { type Actions, createActions } from "./actions";
 
 export interface ReactSpreadsheet {
   // XXX Move these data fields away
   cells: Record<string, string>;
-  columns: Column[];
   othersByCell: Record<string, UserInfo>;
-  rows: Row[];
   selection: CellAddress | null;
-  users: readonly User<Presence, UserMeta>[];
 
   // Readers
   // XXX Move these readers away
@@ -56,7 +45,6 @@ export function useSpreadsheet(): ReactSpreadsheet {
   const [cells, setCells] = useState<Record<string, string>>({});
   const [selection, setSelection] = useState<CellAddress | null>(null);
 
-  const users = useOthers();
   const othersByCell = useOthers(
     (others) =>
       others.reduce((prev, curr) => {
@@ -99,10 +87,7 @@ export function useSpreadsheet(): ReactSpreadsheet {
 
   return {
     // XXX Move these data fields away
-    rows,
-    columns,
     cells,
-    users,
     selection,
     othersByCell,
 
