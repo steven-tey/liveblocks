@@ -1,0 +1,47 @@
+{
+  "name": "@liveblocks/core",
+  "version": "0.18.4",
+  "description": "Shared code and foundational internals for Liveblocks",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**",
+    "README.md"
+  ],
+  "keywords": [
+    "liveblocks",
+    "multiplayer",
+    "live-cursors",
+    "collaborative"
+  ],
+  "bugs": {
+    "url": "https://github.com/liveblocks/liveblocks/issues"
+  },
+  "scripts": {
+    "dev": "tsup --watch --onSuccess ../../scripts/build.sh",
+    "build": "tsup && ../../scripts/build.sh",
+    "format": "eslint --fix src/ && prettier --write src/",
+    "lint": "eslint src/",
+    "test": "jest --silent --verbose",
+    "test:watch": "jest --silent --verbose --watch",
+    "test-e2e": "jest --silent --verbose --config=./jest.config.e2e.js"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@liveblocks/eslint-config": "*",
+    "@liveblocks/jest-config": "*",
+    "@types/ws": "^8.5.3",
+    "dotenv": "^16.0.3",
+    "eslint-plugin-rulesdir": "^0.2.1",
+    "fast-check": "^3.0.1",
+    "msw": "^0.47.4",
+    "ws": "^8.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liveblocks/liveblocks.git",
+    "directory": "packages/liveblocks-core"
+  },
+  "sideEffects": false
+}

@@ -1,14 +1,13 @@
 import type { BaseUserMeta, Json, JsonObject } from "@liveblocks/client";
-import { shallow } from "@liveblocks/client";
-import type { ServerMsg } from "@liveblocks/client/internal";
-import {
-  ClientMsgCode,
-  CrdtType,
-  ServerMsgCode,
-} from "@liveblocks/client/internal";
+import { createClient, shallow } from "@liveblocks/client";
+import type { ServerMsg } from "@liveblocks/core";
+import { ClientMsgCode, CrdtType, ServerMsgCode } from "@liveblocks/core";
+import { render } from "@testing-library/react";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
+import * as React from "react";
 
+import { createRoomContext } from "../factory";
 import {
   useCanRedo,
   useCanUndo,
@@ -189,6 +188,7 @@ async function websocketSimulator() {
       actor,
       id: undefined,
       info: undefined,
+      scopes: [],
     });
 
     simulateIncomingMessage({
@@ -219,6 +219,50 @@ async function websocketSimulator() {
     simulateUserJoins,
   };
 }
+
+describe("RoomProvider", () => {
+  test("shouldInitiallyConnect equals false should not call the auth endpoint", () => {
+    const authEndpointMock = jest.fn();
+    const client = createClient({
+      authEndpoint: authEndpointMock,
+    });
+
+    const { RoomProvider } = createRoomContext(client);
+
+    render(
+      <RoomProvider
+        id="room"
+        initialPresence={{}}
+        shouldInitiallyConnect={false}
+      >
+        <></>
+      </RoomProvider>
+    );
+
+    expect(authEndpointMock).not.toBeCalled();
+  });
+
+  test("shouldInitiallyConnect equals true should call the auth endpoint", () => {
+    const authEndpointMock = jest.fn();
+    const client = createClient({
+      authEndpoint: authEndpointMock,
+    });
+
+    const { RoomProvider } = createRoomContext(client);
+
+    render(
+      <RoomProvider
+        id="room"
+        initialPresence={{}}
+        shouldInitiallyConnect={true}
+      >
+        <></>
+      </RoomProvider>
+    );
+
+    expect(authEndpointMock).toBeCalled();
+  });
+});
 
 describe("useRoom", () => {
   test("initial presence should be sent to other users when socket is connected", async () => {
@@ -265,8 +309,8 @@ describe("useOthers", () => {
     const sim = await websocketSimulator();
     act(() => sim.simulateUserJoins(1, { x: 2 }));
 
-    expect(result.current.toArray()).toEqual([
-      { connectionId: 1, presence: { x: 2 } },
+    expect(result.current).toEqual([
+      { connectionId: 1, presence: { x: 2 }, isReadOnly: false },
     ]);
   });
 
@@ -276,8 +320,8 @@ describe("useOthers", () => {
     const sim = await websocketSimulator();
     act(() => sim.simulateUserJoins(1, { x: 0 }));
 
-    expect(result.current.toArray()).toEqual([
-      { connectionId: 1, presence: { x: 0 } },
+    expect(result.current).toEqual([
+      { connectionId: 1, presence: { x: 0 }, isReadOnly: false },
     ]);
 
     act(() =>
@@ -288,8 +332,8 @@ describe("useOthers", () => {
       })
     );
 
-    expect(result.current.toArray()).toEqual([
-      { connectionId: 1, presence: { x: 0, y: 0 } },
+    expect(result.current).toEqual([
+      { connectionId: 1, presence: { x: 0, y: 0 }, isReadOnly: false },
     ]);
   });
 
@@ -299,13 +343,13 @@ describe("useOthers", () => {
     const sim = await websocketSimulator();
     act(() => sim.simulateUserJoins(1, { x: 2 }));
 
-    expect(result.current.toArray()).toEqual([
-      { connectionId: 1, presence: { x: 2 } },
+    expect(result.current).toEqual([
+      { connectionId: 1, presence: { x: 2 }, isReadOnly: false },
     ]);
 
     act(() => sim.simulateAbnormalClose());
 
-    expect(result.current.toArray()).toEqual([]);
+    expect(result.current).toEqual([]);
   });
 });
 

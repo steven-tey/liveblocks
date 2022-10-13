@@ -1,19 +1,13 @@
 {
   "name": "@liveblocks/redux",
-  "version": "0.18.3-dev",
+  "version": "0.18.4",
   "description": "A store enhancer to integrate Liveblocks into Redux stores.",
-  "main": "./index.js",
-  "module": "./index.mjs",
-  "types": "./index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./index.js",
-      "import": "./index.mjs",
-      "types": "./index.d.ts"
-    }
-  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "files": [
-    "**"
+    "dist/**",
+    "README.md"
   ],
   "keywords": [
     "redux",
@@ -24,11 +18,12 @@
     "collaborative"
   ],
   "scripts": {
+    "dev": "tsup --watch --onSuccess ../../scripts/build.sh",
     "build": "tsup && ../../scripts/build.sh",
     "format": "eslint --fix src/ && prettier --write src/",
     "lint": "eslint src/",
-    "test": "jest --watch --silent --verbose",
-    "test-ci": "jest --silent --verbose",
+    "test": "jest --silent --verbose",
+    "test:watch": "jest --silent --verbose --watch",
     "dtslint": "dtslint --localTs node_modules/typescript/lib --expectOnly types"
   },
   "license": "Apache-2.0",
@@ -37,32 +32,21 @@
     "url": "https://github.com/liveblocks/liveblocks.git",
     "directory": "packages/liveblocks-redux"
   },
+  "dependencies": {
+    "@liveblocks/client": "0.18.4",
+    "@liveblocks/core": "0.18.4"
+  },
   "peerDependencies": {
-    "@liveblocks/client": "0.18.3",
     "redux": "^4"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.10",
-    "@babel/preset-env": "^7.17.10",
-    "@babel/preset-typescript": "^7.16.7",
     "@definitelytyped/dtslint": "^0.0.103",
+    "@liveblocks/eslint-config": "*",
+    "@liveblocks/jest-config": "*",
     "@reduxjs/toolkit": "^1.7.2",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/react-hooks": "^7.0.2",
-    "@types/jest": "^27.5.1",
-    "@typescript-eslint/eslint-plugin": "^5.26.0",
-    "@typescript-eslint/parser": "^5.26.0",
-    "eslint": "^8.12.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-simple-import-sort": "^7.0.0",
-    "jest": "^27.4.7",
+    "@testing-library/jest-dom": "^5.16.5",
     "msw": "^0.36.4",
-    "prettier": "^2.7.1",
-    "redux": "^4.1.2",
-    "tsup": "^6.2.2",
-    "typescript": "^4.7.2",
-    "whatwg-fetch": "^3.6.2"
+    "redux": "^4.1.2"
   },
   "sideEffects": false
 }
