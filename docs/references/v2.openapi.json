@@ -33,25 +33,15 @@
                           "lastConnectionAt": "2022-08-08T23:23:15.281Z",
                           "createdAt": "2022-08-08T23:23:15.281Z",
                           "metadata": {
-                            "name": [
-                              "My room"
-                            ],
-                            "type": [
-                              "whiteboard"
-                            ]
+                            "name": ["My room"],
+                            "type": ["whiteboard"]
                           },
-                          "defaultAccesses": [
-                            "room:write"
-                          ],
+                          "defaultAccesses": ["room:write"],
                           "groupsAccesses": {
-                            "product": [
-                              "room:write"
-                            ]
+                            "product": ["room:write"]
                           },
                           "usersAccesses": {
-                            "vinod": [
-                              "room:write"
-                            ]
+                            "vinod": ["room:write"]
                           }
                         }
                       ]
@@ -143,18 +133,12 @@
                       "metadata": {
                         "color": "blue"
                       },
-                      "defaultAccesses": [
-                        "room:write"
-                      ],
+                      "defaultAccesses": ["room:write"],
                       "groupsAccesses": {
-                        "product": [
-                          "room:write"
-                        ]
+                        "product": ["room:write"]
                       },
                       "usersAccesses": {
-                        "alice": [
-                          "room:write"
-                        ]
+                        "alice": ["room:write"]
                       }
                     }
                   }
@@ -186,21 +170,15 @@
                 "example": {
                   "value": {
                     "id": "my-room-3ebc26e2bf96",
-                    "defaultAccesses": [
-                      "room:write"
-                    ],
+                    "defaultAccesses": ["room:write"],
                     "metadata": {
                       "color": "blue"
                     },
                     "usersAccesses": {
-                      "alice": [
-                        "room:write"
-                      ]
+                      "alice": ["room:write"]
                     },
                     "groupsAccesses": {
-                      "product": [
-                        "room:write"
-                      ]
+                      "product": ["room:write"]
                     }
                   }
                 }
@@ -245,26 +223,15 @@
                       "metadata": {
                         "color": "blue",
                         "size": "10",
-                        "target": [
-                          "abc",
-                          "def"
-                        ]
+                        "target": ["abc", "def"]
                       },
-                      "defaultAccesses": [
-                        "room:write"
-                      ],
+                      "defaultAccesses": ["room:write"],
                       "groupsAccesses": {
-                        "marketing": [
-                          "room:write"
-                        ]
+                        "marketing": ["room:write"]
                       },
                       "usersAccesses": {
-                        "alice": [
-                          "room:write"
-                        ],
-                        "vinod": [
-                          "room:write"
-                        ]
+                        "alice": ["room:write"],
+                        "vinod": ["room:write"]
                       }
                     }
                   }
@@ -306,26 +273,15 @@
                       "metadata": {
                         "color": "blue",
                         "size": "10",
-                        "target": [
-                          "abc",
-                          "def"
-                        ]
+                        "target": ["abc", "def"]
                       },
-                      "defaultAccesses": [
-                        "room:write"
-                      ],
+                      "defaultAccesses": ["room:write"],
                       "groupsAccesses": {
-                        "marketing": [
-                          "room:write"
-                        ]
+                        "marketing": ["room:write"]
                       },
                       "usersAccesses": {
-                        "alice": [
-                          "room:write"
-                        ],
-                        "vinod": [
-                          "room:write"
-                        ]
+                        "alice": ["room:write"],
+                        "vinod": ["room:write"]
                       }
                     }
                   }
@@ -357,21 +313,13 @@
               "examples": {
                 "example-1": {
                   "value": {
-                    "defaultAccesses": [
-                      "room:write"
-                    ],
+                    "defaultAccesses": ["room:write"],
                     "usersAccesses": {
-                      "vinod": [
-                        "room:write"
-                      ],
-                      "alice": [
-                        "room:write"
-                      ]
+                      "vinod": ["room:write"],
+                      "alice": ["room:write"]
                     },
                     "groupsAccesses": {
-                      "marketing": [
-                        "room:write"
-                      ]
+                      "marketing": ["room:write"]
                     },
                     "metadata": {
                       "color": "blue"
@@ -413,7 +361,7 @@
         "summary": "Get active users",
         "tags": [],
         "operationId": "get-rooms-roomId-active-users",
-        "description": "Returns a list of users currently present in the requested room. For better performance, we recommand to call this endpoint every 10 seconds maximum. \nDuplicates can happen if a user is in the requested room with multiple browser tabs opened.",
+        "description": "Returns a list of users currently present in the requested room. For better performance, we recommend to call this endpoint every 10 seconds maximum. \nDuplicates can happen if a user is in the requested room with multiple browser tabs opened.",
         "responses": {
           "200": {
             "description": "Success. Returns the list of active users for the specified room.",
@@ -484,10 +432,7 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": [
-                        "string",
-                        "object"
-                      ]
+                      "type": ["string", "object"]
                     }
                   }
                 },
@@ -504,10 +449,7 @@
                         },
                         "aLiveList": {
                           "liveblocksType": "LiveList",
-                          "data": [
-                            "a",
-                            "b"
-                          ]
+                          "data": ["a", "b"]
                         },
                         "aLiveMap": {
                           "liveblocksType": "LiveMap",
@@ -551,10 +493,7 @@
                       "type": "string"
                     },
                     "data": {
-                      "type": [
-                        "string",
-                        "object"
-                      ]
+                      "type": ["string", "object"]
                     }
                   }
                 },
@@ -571,10 +510,7 @@
                         },
                         "aLiveList": {
                           "liveblocksType": "LiveList",
-                          "data": [
-                            "a",
-                            "b"
-                          ]
+                          "data": ["a", "b"]
                         },
                         "aLiveMap": {
                           "liveblocksType": "LiveMap",
@@ -628,10 +564,7 @@
                       },
                       "aLiveList": {
                         "liveblocksType": "LiveList",
-                        "data": [
-                          "a",
-                          "b"
-                        ]
+                        "data": ["a", "b"]
                       },
                       "aLiveMap": {
                         "liveblocksType": "LiveMap",
@@ -714,16 +647,10 @@
                 "example-1": {
                   "value": {
                     "userId": "b2c1c290-f2c9-45de-a74e-6b7aa0690f59",
-                    "groupIds": [
-                      "g1",
-                      "g2"
-                    ],
+                    "groupIds": ["g1", "g2"],
                     "userInfo": {
                       "name": "bob",
-                      "colors": [
-                        "blue",
-                        "red"
-                      ]
+                      "colors": ["blue", "red"]
                     }
                   }
                 }
@@ -821,9 +748,7 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "room"
-            ]
+            "enum": ["room"]
           },
           "lastConnectionAt": {
             "type": "string",
@@ -840,10 +765,7 @@
             }
           },
           "defaultAccesses": {
-            "type": [
-              "string",
-              "array"
-            ],
+            "type": ["string", "array"],
             "uniqueItems": true,
             "items": {}
           },
@@ -878,24 +800,15 @@
             }
           },
           "usersAccesses": {
-            "type": [
-              "object",
-              "null"
-            ],
+            "type": ["object", "null"],
             "description": "A map of user identifiers to permissions list. Setting the value as `null` will clear all users' accesses. Setting one user identifier as `null` will clear this user's accesses."
           },
           "groupsAccesses": {
-            "type": [
-              "object",
-              "null"
-            ],
+            "type": ["object", "null"],
             "description": "A map of group identifiers to permissions list. Setting the value as `null` will clear all groups' accesses. Setting one group identifier as `null` will clear this group's accesses."
           },
           "metadata": {
-            "type": [
-              "object",
-              "null"
-            ],
+            "type": ["object", "null"],
             "description": "A map of metadata keys to their values (`string` or `string[]`). Setting the value as `null` will clear all metadata. Setting a key as `null` will clear the key."
           }
         }
@@ -923,10 +836,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "id",
-          "defaultAccesses"
-        ]
+        "required": ["id", "defaultAccesses"]
       },
       "Error": {
         "title": "Error",
@@ -1005,10 +915,7 @@
                   "type": "object"
                 },
                 "defaultAccesses": {
-                  "type": [
-                    "string",
-                    "array"
-                  ],
+                  "type": ["string", "array"],
                   "items": {}
                 },
                 "usersAccesses": {
